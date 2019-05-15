@@ -92,7 +92,7 @@ export async function getAllOwnersRecords(payload) {
   // console.log(querySnapshot , 'querySnapshot')
 
   let dataArray = [];
-  
+
   querySnapshot.forEach(doc => {
     dataArray.push({ ...doc.data(), showAnimalDetails: false, key: doc.id });
   });
@@ -127,7 +127,7 @@ export async function updateOwnerRecords(payload) {
   try {
     await firestore
       .collection(collection)
-      console.log(collection , 'collection')
+    console.log(collection, 'collection')
 
     return {
       status: "success",
@@ -146,7 +146,6 @@ export function addOwnerToDatabase(values) {
   const { ownerImage, animalDetails, ...rest } = values;
   console.log(ownerImage);
   console.log(values)
-
   return new Promise((resolve, reject) => {
     firestore
       .collection("owners")
@@ -160,8 +159,9 @@ export function addOwnerToDatabase(values) {
         );
         // console.log('owner_images')
         const { id } = docRef;
+        console.log(docRef , 'docRef')
         // console.log(id)
-        console.log(ownerImage , 'ownerImage')
+        console.log(ownerImage, 'ownerImage')
         console.log(ownerImage.fileList[0]);
 
         // ownerImage.fileList.map((val) => {
@@ -172,14 +172,14 @@ export function addOwnerToDatabase(values) {
           .child(`owner_images/${id}`)
           .put(ownerImage.fileList[0]);
 
-        
-          console.log('animals')
+
+        console.log('animals')
         task.on(
           "state_changed",
-          function(snapshot) {},
-          function(error) {},
-          function() {
-            task.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+          function (snapshot) { },
+          function (error) { },
+          function () {
+            task.snapshot.ref.getDownloadURL().then(function (downloadURL) {
               console.log("uploaded the owner image with URL: " + downloadURL);
               docRef
                 .update({
@@ -207,9 +207,20 @@ export function addOwnerToDatabase(values) {
             });
           }
         );
+        // var connectedRef = firebase.database().ref(".info/connected");
+        // console.log(connectedRef)
+        // connectedRef.on("value", function (snap) {
+        //   console.log(snap.val())
+        //   if (snap.val() === true) {
+        //     // alert("connected");
+        //   } else {
+        //     // alert("not connected");
+        //   }
+        // });
       })
-      .catch(error => {});
+      .catch(error => { });
   });
+
 }
 
 function uploadAnimals(ownerDoc, animalDetails) {
@@ -218,10 +229,11 @@ function uploadAnimals(ownerDoc, animalDetails) {
   return animalDetails.map((animal, index) => {
     return new Promise((resolve, reject) => {
       let { age, image } = animal;
-      console.log(animal , 'animal');
-      console.log(animalDetails , 'animalDetails')
+      console.log(animal, 'animal');
+      console.log(animalDetails, 'animalDetails')
 
       const docRef = animalCollection.doc(ownerDoc.id + index);
+      
 
       docRef
         .set({
@@ -238,10 +250,10 @@ function uploadAnimals(ownerDoc, animalDetails) {
             .put(image);
           task.on(
             "state_changed",
-            function(snapshot) {},
-            function(error) {},
-            function() {
-              task.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+            function (snapshot) { },
+            function (error) { },
+            function () {
+              task.snapshot.ref.getDownloadURL().then(function (downloadURL) {
                 console.log(
                   "uploaded the child Image with url: " + downloadURL
                 );

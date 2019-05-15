@@ -21,23 +21,66 @@ import {
 
 //workers
 export function* addOwnerRecordToFirebase(action) {
-  try {
-    yield put(
-      actionCreators.createOwnerRecordLoading("Working, please wait..")
+
+  if (navigator.onLine) {
+    console.log('online')
+    try {
+      yield put(
+        actionCreators.createOwnerRecordLoading("Working, please wait..")
       );
       console.log('action calll')
 
-    const successMessage = yield call(
-      addOwnerToDatabase,
-      action.payload.values
-    );
-    console.log(successMessage , 'successMessage')
+      const successMessage = yield call(
+        addOwnerToDatabase,
+        action.payload.values
+      );
+      console.log(action.payload.values , 'action payload values online')
+      // console.log(action.payload.values)
+      console.log(successMessage, 'successMessage')
 
-    yield put(actionCreators.createOwnerRecordSuccess(successMessage));
-  } catch (exception) {
-    yield put(
-      actionCreators.createOwnerRecordFailed("Failed adding to database")
-    );
+      yield put(actionCreators.createOwnerRecordSuccess(successMessage));
+    } catch (exception) {
+      yield put(
+        actionCreators.createOwnerRecordFailed("Failed adding to database")
+      );
+    }
+  }
+  else {
+    // localStorage.setItem(JSON.stringify('animalData', action.payload.values))
+    // localStorage.setItem('animalData', JSON.stringify([action.payload.values]));
+    
+    // if (localStorage.getItem('animalData').length >= 0) {
+      //   var num = localStorage.getItem('animalData').length
+      // }
+      // var num = 0;
+      // arr[num] = action.payload.values;
+      // num++;
+    // console.log('offline')
+    // var arr = [];
+    // arr.push(action.payload.values);
+    // localStorage.setItem('animalData', JSON.stringify(arr));
+    
+    // console.log(arr, 'arr')
+    // console.log(action.payload.values , 'action payload values offline')
+
+    // try {
+    //   // yield put(
+    //   //   actionCreators.createOwnerRecordLoading("Working, please wait..")
+    //   // );
+    //   console.log('action calll')
+
+    //   const successMessage = yield call(
+    //     addOwnerToDatabase,
+    //     action.payload.values
+    //   );
+    //   // console.log(action.payload.values)
+    //   console.log(successMessage, 'successMessage')
+    //   yield put(actionCreators.createOwnerRecordSuccess(successMessage));
+    // } catch (exception) {
+    //   yield put(
+    //     actionCreators.createOwnerRecordFailed("Failed adding to database")
+    //   );
+    // }
   }
 }
 
@@ -85,7 +128,6 @@ export function* addOwnerRecordWatcher() {
 export function* getAllOwnerRecordsWatcher() {
   yield takeEvery(GETRECORDS, getOwnerRecordsFromFireBase);
 }
-
 export function* deleteOwnerRecordWatcher() {
   yield takeEvery(GETRECORDS_DELETE, deleteOwnerRecordsFromFireBase);
 }

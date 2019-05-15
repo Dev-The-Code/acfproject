@@ -99,10 +99,9 @@ export default class extends Component {
                 <div style={{}}>
                   <h4 className="card-details-heading">Animals</h4>
                   <p className="card-details-value">
-                    {/* {this.props.record.animals.length } */}
+                    {this.props.record.animals.length }
                   </p>
                 </div>
-
                 <div style={{}}>
                   <h4 className="card-details-heading">Location</h4>
                   <p className="card-details-value">
