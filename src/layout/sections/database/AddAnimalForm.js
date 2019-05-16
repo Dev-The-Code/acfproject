@@ -3,6 +3,7 @@ import { Form, Input, Icon, Button, Upload, message, Card } from "antd";
 import UploadButton from "../../../components/UploadButton";
 import imageCompress from '../../../imageCompress';
 import AsyncStorage from '@callstack/async-storage';
+import { Blob } from "@firebase/firestore-types";
 
 // import pica from "pica";
 // console.log(pica);
@@ -37,7 +38,7 @@ class RegistrationForm extends Component {
     console.log(offlineData, 'offlineData')
     if (navigator.onLine && offlineData !== null) {
       console.log(offlineData.ownerImage.fileList[0])
-      let ownerImage = new Blob([JSON.stringify(offlineData.ownerImage.fileList)],
+      let ownerImage = new Blob([JSON.stringify(offlineData.ownerImage.fileList[0])],
         { type: offlineData.ownerImage.fileList[0].type },
         // { lastModified: offlineData.ownerImage.fileList[0].lastModified },
         // { lastModifiedDate: offlineData.ownerImage.fileList[0].lastModifiedDate },
@@ -45,6 +46,11 @@ class RegistrationForm extends Component {
         // { uid: offlineData.ownerImage.fileList[0].uid } ,
       )
       console.log(ownerImage, 'ownerImage')
+      // aBlob = blob();
+      // let oldBlob = blob(1024);
+      // oldBlob.resize(512);
+      // oldBlob.resize(2048);
+
       ownerImage['lastModified'] = offlineData.ownerImage.fileList[0].lastModified;
       ownerImage['lastModifiedDate'] = offlineData.ownerImage.fileList[0].lastModifiedDate;
       ownerImage['name'] = offlineData.ownerImage.fileList[0].name;
@@ -53,7 +59,21 @@ class RegistrationForm extends Component {
       // ownerImage['size'] = offlineData.ownerImage.fileList[0].size;
 
       // ownerImage.size = offlineData.ownerImage.fileList[0].size;
+      // let oldBlob = Blob(1024);
+      // oldBlob.resize(2048)
+      // console.log(oldBlob)
       offlineData.ownerImage.fileList[0] = ownerImage
+      console.log(offlineData.ownerImage.fileList, 'fileList of the owner image')
+
+      // let bytes = new Uint8Array(offlineData.ownerImage.fileList[0].length);
+
+      // for (let i = 0; i < bytes.length; i++) {
+      //   bytes[i] = offlineData.ownerImage.fileList[0].charCodeAt(i);
+      // }
+      // let blob = new Blob([bytes], { type: '' });
+
+      // console.log(blob , 'blobblobblobblobblob')
+
 
       // let newObj = { ...ownerImage };
       // var clonedObj = { ...obj };
@@ -514,6 +534,7 @@ class RegistrationForm extends Component {
             })(
               <Upload
                 action="//jsonplaceholder.typicode.com/posts/"
+                listType="picture-card"
                 onRemove={file => this.onRemoveAnimalImage(index)}
                 beforeUpload={file => this.beforeUploadAnimalImage(index)}
                 capture
@@ -598,7 +619,8 @@ class RegistrationForm extends Component {
                   }
                 })(
                   <Upload
-                    action=""
+                    action="//jsonplaceholder.typicode.com/posts/"
+                    listType="picture-card"
                     beforeUpload={() => {
 
                       this.setState(({ ownersImage }) => {
