@@ -23,20 +23,20 @@ import {
 export function* addOwnerRecordToFirebase(action) {
 
   if (navigator.onLine) {
-    console.log('online')
+    // console.log('online')
     try {
       yield put(
         actionCreators.createOwnerRecordLoading("Working, please wait..")
       );
-      console.log('action calll')
+      // console.log('action calll')
 
       const successMessage = yield call(
         addOwnerToDatabase,
         action.payload.values
       );
-      console.log(action.payload.values , 'action payload values online')
+      // console.log(action.payload.values , 'action payload values online')
       // console.log(action.payload.values)
-      console.log(successMessage, 'successMessage')
+      // console.log(successMessage, 'successMessage')
 
       yield put(actionCreators.createOwnerRecordSuccess(successMessage));
     } catch (exception) {
@@ -81,6 +81,8 @@ export function* addOwnerRecordToFirebase(action) {
     //     actionCreators.createOwnerRecordFailed("Failed adding to database")
     //   );
     // }
+    
+    
   }
 }
 

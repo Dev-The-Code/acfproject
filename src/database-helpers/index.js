@@ -145,8 +145,8 @@ export async function updateOwnerRecords(payload) {
 
 export function addOwnerToDatabase(values) {
   const { ownerImage, animalDetails, ...rest } = values;
-  console.log(ownerImage);
-  console.log(values)
+  // console.log(ownerImage);
+  // console.log(values)
   return new Promise((resolve, reject) => {
     firestore
       .collection("owners")
@@ -160,10 +160,10 @@ export function addOwnerToDatabase(values) {
         );
         // console.log('owner_images')
         const { id } = docRef;
-        console.log(docRef , 'docRef')
-        // console.log(id)
-        console.log(ownerImage, 'ownerImage')
-        console.log(ownerImage.fileList[0]);
+        // console.log(docRef , 'docRef')
+        // // console.log(id)
+        // console.log(ownerImage, 'ownerImage')
+        // console.log(ownerImage.fileList[0]);
 
         // ownerImage.fileList.map((val) => {
         //     return console.log(val)
@@ -174,7 +174,7 @@ export function addOwnerToDatabase(values) {
           .put(ownerImage.fileList[0]);
 
 
-        console.log('ownerImage')
+        // console.log('ownerImage')
         task.on(
           "state_changed",
           function (snapshot) { },

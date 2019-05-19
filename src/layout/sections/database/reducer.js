@@ -18,8 +18,8 @@ export const CREATE = "CREATE/FETCH",
   DELETE_ANIMAL_TREATMENT = "DELETE_ANIMAL_TREATMENT/FETCH",
   DELETE_ANIMAL_TREATMENT_RESPONSE = "DELETE_ANIMAL_TREATMENT_RESPONSE/LOCAL",
   SHOW_ANIMAL_TREATMENT = "SHOW_ANIMAL_TREATMENT/LOCAL";
-  // GETRECORDS_UPDATE = "GETRECORDS_UPDATE/FETCH";
-  // UPDATE_OWNER_RECORDS_RESPONSE = 'UPDATE_OWNER_RECORDS_RESPONSE'
+// GETRECORDS_UPDATE = "GETRECORDS_UPDATE/FETCH";
+// UPDATE_OWNER_RECORDS_RESPONSE = 'UPDATE_OWNER_RECORDS_RESPONSE'
 
 //action creators
 export const actionCreators = {
@@ -144,7 +144,7 @@ export default function databaseSectionReducer(
       listLoading: true,
       treatmentRecords: [],
       deleteRecord: null,
-      updateRecord :null
+      updateRecord: null
     }
   },
   action
