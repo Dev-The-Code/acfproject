@@ -142,6 +142,7 @@ export async function updateOwnerRecords(payload) {
     };
   }
 }
+
 export function addOwnerToDatabase(values) {
   const { ownerImage, animalDetails, ...rest } = values;
   console.log(ownerImage);
@@ -173,7 +174,7 @@ export function addOwnerToDatabase(values) {
           .put(ownerImage.fileList[0]);
 
 
-        console.log('animals')
+        console.log('ownerImage')
         task.on(
           "state_changed",
           function (snapshot) { },

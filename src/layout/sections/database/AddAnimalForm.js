@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { Form, Input, Icon, Button, Upload, message, Card } from "antd";
+import { Form, Input, Icon, Button, Upload, message, Card, Modal } from "antd";
 import UploadButton from "../../../components/UploadButton";
 import imageCompress from '../../../imageCompress';
 import AsyncStorage from '@callstack/async-storage';
-import { Blob } from "@firebase/firestore-types";
+// import { Blob } from "@firebase/firestore-types";
 
 // import pica from "pica";
 // console.log(pica);
@@ -19,8 +19,11 @@ class RegistrationForm extends Component {
         fileList: []
       },
       ownerAnimal: [{ showUpload: true, fileList: [] }],
-      files: [],
-      newVal: ''
+      filesss: [],
+      newVal: '',
+      previewVisible: false,
+      previewImage: '',
+      preview: ''
     };
 
     // this.handleSubmit = this.handleSubmit.bind(this);
@@ -36,25 +39,127 @@ class RegistrationForm extends Component {
   async componentDidMount() {
     let offlineData = JSON.parse(localStorage.getItem('animalData'))
     console.log(offlineData, 'offlineData')
-    if (navigator.onLine && offlineData !== null) {
-      console.log(offlineData.ownerImage.fileList[0])
-      let ownerImage = new Blob([JSON.stringify(offlineData.ownerImage.fileList[0])],
-        { type: offlineData.ownerImage.fileList[0].type },
-        // { lastModified: offlineData.ownerImage.fileList[0].lastModified },
-        // { lastModifiedDate: offlineData.ownerImage.fileList[0].lastModifiedDate },
-        // { name: offlineData.ownerImage.fileList[0].name },
-        // { uid: offlineData.ownerImage.fileList[0].uid } ,
-      )
-      console.log(ownerImage, 'ownerImage')
-      // aBlob = blob();
-      // let oldBlob = blob(1024);
-      // oldBlob.resize(512);
-      // oldBlob.resize(2048);
 
-      ownerImage['lastModified'] = offlineData.ownerImage.fileList[0].lastModified;
-      ownerImage['lastModifiedDate'] = offlineData.ownerImage.fileList[0].lastModifiedDate;
-      ownerImage['name'] = offlineData.ownerImage.fileList[0].name;
-      ownerImage['uid'] = offlineData.ownerImage.fileList[0].uid;
+    if (navigator.onLine && offlineData !== null) {
+      // console.log(offlineData.ownerImage.base64, 'offlineData')
+
+      let contentType = offlineData.ownerImage.base64.substring("data:".length,
+        offlineData.ownerImage.base64.indexOf(";base64"))
+      // base64Data.substring("data:image/".length, base64Data.indexOf(";base64"))
+
+      // const byteCharacters = atob(offlineData.ownerImage.base64);
+      let imageData = offlineData.ownerImage.base64;
+      var byteCharacters = atob(imageData.replace(/^data:image\/(png|jpeg|jpg);base64,/, ''));
+
+      console.log(byteCharacters , 'byteCharacters')
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+        // console.log(byteNumbers , 'byteNumbers')
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      console.log(byteArray, 'byteArray')
+      const blob = new Blob([byteArray], { type: contentType });
+
+      console.log(blob, 'blob')
+
+
+      // const blob = new Blob([offlineData.ownerImage.base64], { type: contentType });
+      // const blob = new Blob([JSON.stringify(offlineData.ownerImage.base64)], { type: contentType });
+      // var file = new File([offlineData.ownerImage.base64], 'imageFileName2.png', {type: 'image/png'});
+      // const blob = new Blob([file], { type: contentType });
+
+
+      blob['lastModified'] = offlineData.ownerImage.fileList[0].lastModified;
+      blob['lastModifiedDate'] = offlineData.ownerImage.fileList[0].lastModifiedDate;
+      blob['name'] = offlineData.ownerImage.fileList[0].name;
+      blob['uid'] = offlineData.ownerImage.fileList[0].uid;
+      // offlineData.ownerImage.fileList[0] = blob.size;
+      // offlineData.ownerImage.fileList[0] = blob.type;
+      // console.log(blob)
+      delete offlineData.ownerImage.base64
+      offlineData.ownerImage.fileList[0] = blob
+      // console.log(offlineData.ownerImage.fileList[0], 'file list of owner image')
+
+      //cheking blob is correct creating
+      // var reader = new FileReader();
+      // reader.readAsDataURL(offlineData.ownerImage.fileList[0]);
+      // reader.onloadend = function () {
+      //   let base64data = reader.result;
+      //   console.log(base64data);
+      // }
+
+      // this.setState({ ownersImage: offlineData.ownerImage })
+
+      // const newState = { showUpload: false, fileList: offlineData.ownerImage.fileList }
+
+      // console.log(newState, 'newState')
+      // this.setState(state => {
+      //   return {
+      //     ...state,
+      //     ownersImage: [
+      //       ...newState,
+      //     ],
+      //     // fileList: [compressedImage]  
+      //   }
+      // })
+      // console.log(this.state.ownersImage)
+
+      // var uri = URL.createObjectURL(blob);
+      // var img = new Image();
+
+      // img.src = uri;
+      // document.body.appendChild(img);
+
+
+
+      // // console.log(offlineData , 'offlineDataofflineDataofflineData')
+      this.props.createOwnerRecord(offlineData)
+
+
+      // let ownerImage = new Blob([JSON.stringify(offlineData.ownerImage.fileList[0])],
+      //   { type: offlineData.ownerImage.fileList[0].type },
+      //   // { lastModified: offlineData.ownerImage.fileList[0].lastModified },
+      //   // { lastModifiedDate: offlineData.ownerImage.fileList[0].lastModifiedDate },
+      //   // { name: offlineData.ownerImage.fileList[0].name },
+      //   // { uid: offlineData.ownerImage.fileList[0].uid } ,
+      // )
+      // offlineData.ownerImage.fileList[0] = ownerImage
+      // console.log(ownerImage, 'ownerImage')
+      // // aBlob = blob();
+      // // let oldBlob = blob(1024);
+      // // oldBlob.resize(512);
+      // // oldBlob.resize(2048);
+
+      // ownerImage['lastModified'] = offlineData.ownerImage.fileList[0].lastModified;
+      // ownerImage['lastModifiedDate'] = offlineData.ownerImage.fileList[0].lastModifiedDate;
+      // ownerImage['name'] = offlineData.ownerImage.fileList[0].name;
+      // ownerImage['uid'] = offlineData.ownerImage.fileList[0].uid;
+      // offlineData.ownerImage.fileList[0] = ownerImage
+      //  console.log(localStrorage.getItem('animalData')) 
+      // function getBase64(file) {
+      //   var reader = new FileReader();
+      //   console.log(reader)
+      //   // reader.readAsText(file);
+      //   // reader.onload = function () {
+      //   //   console.log(reader.result,'base 64');
+      //   // };
+      //   // reader.onerror = function (error) {
+      //   //   console.log('Error: ', error);
+      //   // };
+      // }
+
+      // //var file = document.querySelector('#files > input[type="file"]').files[0];
+      // getBase64(offlineData.ownerImage.fileList[0]); // prints the base64 string
+      // // console.log(offlineData.ownerImage.fileList[0])
+
+      // console.log( offlineData.ownerImage.fileList , 'owner image file list')
+
+      // const compressedImage = await imageCompress(ownerImage);
+
+      // const compressedImage = await imageCompress(offlineData.ownerImage.fileList[0]);
+      // console.log(compressedImage , 'offline compressedImage')
+
       // delete ownerImage.size;
       // ownerImage['size'] = offlineData.ownerImage.fileList[0].size;
 
@@ -62,8 +167,7 @@ class RegistrationForm extends Component {
       // let oldBlob = Blob(1024);
       // oldBlob.resize(2048)
       // console.log(oldBlob)
-      offlineData.ownerImage.fileList[0] = ownerImage
-      console.log(offlineData.ownerImage.fileList, 'fileList of the owner image')
+      // console.log(offlineData.ownerImage.fileList, 'fileList of the owner image')
 
       // let bytes = new Uint8Array(offlineData.ownerImage.fileList[0].length);
 
@@ -74,19 +178,12 @@ class RegistrationForm extends Component {
 
       // console.log(blob , 'blobblobblobblobblob')
 
-
       // let newObj = { ...ownerImage };
       // var clonedObj = { ...obj };
       // Object.assign(newObj, ownerImage);
       // const copied = Object.create(ownerImage)
 
       // console.log(copied , 'newObj')
-
-
-
-
-
-
       // Object.assign(ownerImage.size, offlineData.ownerImage.fileList[0].size)
 
       // console.log(ownerImage, 'after blob')
@@ -95,14 +192,13 @@ class RegistrationForm extends Component {
       // console.log(offlineData.ownerImage.fileList[0])
       // console.log(offlineData, 'after set blob')
 
-      offlineData.animalDetails.map((elem, i) => {
-        console.log(elem, 'eeeeeee')
-        console.log(elem.image, "elem");
-        // console.log(elem.image = new Blob([JSON.stringify(elem.image)]) , 'elem.image = new Blob([JSON.stringify(elem.image)])');
-        return elem.image = new Blob([JSON.stringify(elem.image)], { type: '' })
-      })
+      // offlineData.animalDetails.map((elem, i) => {
+      //   // console.log(elem, 'eeeeeee')
+      //   // console.log(elem.image, "elem");
+      //   // console.log(elem.image = new Blob([JSON.stringify(elem.image)]) , 'elem.image = new Blob([JSON.stringify(elem.image)])');
+      //   return elem.image = new Blob([JSON.stringify(elem.image)], { type: '' })
+      // })
 
-      this.props.createOwnerRecord(offlineData)
 
 
       // console.log(offlineData.ownerImage.fileList, 'hhhhhh')
@@ -136,40 +232,99 @@ class RegistrationForm extends Component {
 
         if (navigator.onLine) {
           const sanitizedValues = this.prepareDataForSaving(values);
-          console.log(sanitizedValues)
+          // console.log(sanitizedValues)
           this.props.createOwnerRecord(sanitizedValues);
         }
         else {
-          console.log('offline')
+          // console.log('offline')
           const offlineValues = this.prepareDataForSaving(values);
-          console.log(offlineValues, 'offlineValues')
-          let ownerArr = [];
-          let filess = {};
-          for (var i = 0; i < offlineValues.ownerImage.fileList.length; i++) {
-            console.log(offlineValues.ownerImage.fileList[i].name);
-            filess = {
-              'lastModified': offlineValues.ownerImage.fileList[i].lastModified,
-              'lastModifiedDate': offlineValues.ownerImage.fileList[i].lastModifiedDate,
-              'name': offlineValues.ownerImage.fileList[i].name,
-              'size': offlineValues.ownerImage.fileList[i].size,
-              'type': offlineValues.ownerImage.fileList[i].type,
-              'uid': offlineValues.ownerImage.fileList[i].uid,
-            }
-            //add the file obj to your array
-            ownerArr.push(filess)
-            console.log(ownerArr)
-            offlineValues.ownerImage.fileList = ownerArr
+          // console.log(offlineValues, 'offlineValues')
+          // let ownerArr = [];
+          // let filess = {};
+          // for (var i = 0; i < offlineValues.ownerImage.fileList.length; i++) {
+          //   // console.log(offlineValues.ownerImage.fileList[i].name);
+          //   filess = {
+          //     'lastModified': offlineValues.ownerImage.fileList[i].lastModified,
+          //     'lastModifiedDate': offlineValues.ownerImage.fileList[i].lastModifiedDate,
+          //     'name': offlineValues.ownerImage.fileList[i].name,
+          //     'size': offlineValues.ownerImage.fileList[i].size,
+          //     'type': offlineValues.ownerImage.fileList[i].type,
+          //     'uid': offlineValues.ownerImage.fileList[i].uid,
+          //   }
+          //   //add the file obj to your array
+          //   ownerArr.push(filess)
+          //   // console.log(ownerArr)
+          //   offlineValues.ownerImage.fileList = ownerArr
+          // }
+
+          // console.log(offlineValues, 'sanitizedValues')
+          // console.log(offlineValues.animalDetails, 'animalDetails')
+          // let animalArr = [];
+          // let files = {};
+
+          // console.log(offlineValues.ownerImage.fileList , 'offlineValues')
+          //bannerImage = document.getElementById('bannerImg');
+          // function getBase64Image(img) {
+          //   var canvas = document.createElement("canvas");
+          //   console.log(canvas, 'canvas')
+          //   canvas.width = img.width;
+          //   canvas.height = img.height;
+
+
+          //   var ctx = canvas.getContext("2d");
+          //   ctx.drawImage(img, 0, 0);
+          //   console.log(ctx , 'ctx')
+          //   var dataURL = canvas.toDataURL("image/png");
+          //   console.log(dataURL, 'dataURL')
+          //   return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+          // }
+
+          const getBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = error => reject(error);
+              // console.log(file, '...............')
+              reader.readAsDataURL(file);
+            });
           }
 
-          console.log(offlineValues, 'sanitizedValues')
-          console.log(offlineValues.animalDetails, 'sanitizedValues')
+          // var imgData = getBase64Image(offlineValues.ownerImage.fileList);
+          let base;
+          const file = offlineValues.ownerImage.fileList[0];
+          // console.log(file)
+          getBase64(file).then(base64 => {
+            // localStorage.setItem("imgData" , base64)
+            base = base64
+            // console.debug("file stored", base64);
+            // console.log(base, 'base')
+            offlineValues.ownerImage.base64 = base;
+            // offlineValues.animalDetails.map((elem, index) => {
+            //   console.log(elem.image, 'fileList of animal image')
+            //   // elem = base
+            // })
+            // let offlineData = offlineValues
+            // console.log(offlineValues, '....')
 
-          localStorage.setItem('animalData', JSON.stringify(offlineValues));
+            // console.log(offlineData, 'offlineData')
+
+            localStorage.setItem('animalData', JSON.stringify(offlineValues))
+            // .then((obj) => { console.log(obj, '....................') })
+            // .catch(() => { })
+          });
 
 
 
 
 
+
+
+
+          // localStorage.setItem('animalData', JSON.stringify(offlineData));
+          // localStorage.setItem("imgData", imgData);
+          // localStorage.setItem('animalData', JSON.stringify(offlineValues));
+          // var a = JSON.parse(localStorage.getItem('imgData'));
+          // console.log(a, 'after save in local storage')
 
 
           // var arr = [];
@@ -192,7 +347,6 @@ class RegistrationForm extends Component {
           // let animalArr = [];
           // let files = {};
           // console.log(sanitizedValues.ownerImage.fileList.length)
-
           // console.log(sanitizedValues.animalDetails.length)
 
 
@@ -211,7 +365,6 @@ class RegistrationForm extends Component {
 
           // //   //save the array to localStorage
           //   console.log(JSON.stringify(myArray));
-
           // let objLocal = {};
           // objLocal.ownerName = sanitizedValues.ownerName;
           // objLocal.address = sanitizedValues.address;
@@ -225,7 +378,6 @@ class RegistrationForm extends Component {
 
 
           // console.log(sanitizedValues.ownerImage.fileList[0].lastModified)
-
           // localStorage.setItem('animalData', JSON.stringify(objLocal))
           // var templocal = JSON.parse(localStorage.getItem('animalData'));
           // console.log(templocal)
@@ -248,8 +400,8 @@ class RegistrationForm extends Component {
   }
 
   prepareDataForSaving(data) {
-    // console.log(data , "prepareDataForving")
     let { animalAge, animalImage } = data;
+    // console.log(data , "prepareDataForving")
     // console.log(this.state.ownerAnimal, 'ownerAnimal')
 
     data.nicNumber === "" || data.nicNumber === undefined ? data.nicNumber = "N/A" : null;
@@ -290,19 +442,22 @@ class RegistrationForm extends Component {
   }
 
   async normFile(e, imageWho, index) {
-    // console.log("e", e)
-    // console.log("index", index)
-
     const { file } = e;
     const { uid } = file;
 
+    // console.log("e", e)
+    // console.log("index", index)
+    // console.log(file, 'fileeee')
+
     const compressedImage = await imageCompress(file);
+    // console.log(compressedImage, 'compressedImage')
     compressedImage.uid = uid;
+    // localStorage.setItem('ownerImage' , JSON.stringify(compressedImage))
     // console.log(compressedImage, 'uuuuuuuuuuuuuuuuuuuuuuuuu')
     if (index !== undefined || index !== null) {
 
       const newState = this.state.ownerAnimal.map((item, i) => {
-        // console.log(i, item)
+        console.log(item, 'item')
         if (i === index) {
           // console.log(index , 'index');
           // console.log(i , 'i');
@@ -416,6 +571,14 @@ class RegistrationForm extends Component {
     }));
   }
 
+  handlePreview = file => {
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true,
+    });
+    console.log(file)
+  };
+
 
 
   beforeUploadAnimalImage(index) {
@@ -447,29 +610,61 @@ class RegistrationForm extends Component {
     }));
   }
 
-  // _handleImageChange(e) {
-  //   e.preventDefault();
-  //   let reader = new FileReader();
-  //   let file = e.target.files[0];
+  _handleImageChange(e) {
+    // const { filesss } = this.state
+    e.preventDefault();
+    let reader = new FileReader();
+    var file = e.target.files[0];
+    // console.log(file , 'file')
+    // console.log(reader , 'reader')
 
-  //   reader.onloadend = () => {
-  //     this.setState({
-  //       files: file,
-  //       imagePreviewUrl: reader.result
-  //     });
-  //   }
-  //   // this.setState({
-  //   //   newVal: 'helllllllllll'
-  //   // })
+    // reader.onloadend = () => {
+    this.setState({
+      filesss: file,
+      // imagePreviewUrl: reader.result
+    });
+    // }
+    // this.setState({
+    //   newVal: 'helllllllllll'
+    // })
 
-  //   reader.readAsDataURL(file)
-  //   // console.log(files)
-  // }
+    reader.readAsDataURL(file)
+    // console.log(this.state.filesss)
+  }
 
+  handleCancel = () => this.setState({ previewVisible: false });
+
+  beforeUpload = () => {
+
+    this.setState(({ ownersImage }) => {
+      const newState = {
+        ownersImage: {
+          ...ownersImage,
+          showUpload: false,
+        }
+      };
+      return newState;
+    });
+    return false;
+  }
+
+  onRemove = () => {
+    this.setState(({ ownersImage }) => {
+      const newState = {
+        ownersImage: {
+          ...ownersImage,
+          showUpload: true,
+          fileList: []
+        }
+      };
+      return newState;
+    });
+  }
 
 
   render() {
-    // console.log('add animal file')
+    // console.log(this.state.ownersImage, 'add animal file')
+    const { previewVisible, previewImage, preview } = this.state;
     const { getFieldDecorator } = this.props.form;
 
     const formItemLayout = {
@@ -537,6 +732,7 @@ class RegistrationForm extends Component {
                 listType="picture-card"
                 onRemove={file => this.onRemoveAnimalImage(index)}
                 beforeUpload={file => this.beforeUploadAnimalImage(index)}
+                onPreview={this.handlePreview}
                 capture
                 accept="image/*"
                 listType="picture-card"
@@ -546,6 +742,9 @@ class RegistrationForm extends Component {
                 ) : null}
               </Upload>
             )}
+            <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+              <img alt="example" style={{ width: '100%' }} src={previewImage} />
+            </Modal>
           </FormItem>
         </div>
       );
@@ -614,48 +813,31 @@ class RegistrationForm extends Component {
             <div>
               <FormItem {...formItemLayout} extra="Upload owner's photograph">
                 {getFieldDecorator("ownerImage", {
-                  getValueFromEvent: (file) => {
-                    this.normFile(file, 'ownersImage')
+                  getValueFromEvent: e => {
+                    this.normFile(e, 'ownersImage')
                   }
                 })(
+
                   <Upload
                     action="//jsonplaceholder.typicode.com/posts/"
                     listType="picture-card"
-                    beforeUpload={() => {
-
-                      this.setState(({ ownersImage }) => {
-                        const newState = {
-                          ownersImage: {
-                            ...ownersImage,
-                            showUpload: false,
-                          }
-                        };
-                        return newState;
-                      });
-                      return false;
-                    }}
-                    onRemove={() => {
-                      this.setState(({ ownersImage }) => {
-                        const newState = {
-                          ownersImage: {
-                            ...ownersImage,
-                            showUpload: true,
-                            fileList: []
-                          }
-                        };
-                        return newState;
-                      });
-                    }}
+                    onRemove={this.onRemove}
+                    beforeUpload={this.beforeUpload}
+                    onPreview={this.handlePreview}
                     capture
+                    accept="image/*"
                     listType="picture-card"
-                    fileList={this.state.ownersImage.fileList}
-                    accept="image/jpeg"
+                  // fileList={this.state.ownersImage.fileList}
                   >
+
                     {this.state.ownersImage.showUpload ? (
                       <UploadButton size="25px" />
                     ) : null}
                   </Upload>
                 )}
+                <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                  <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                </Modal>
               </FormItem>
             </div>
             <div>
@@ -691,6 +873,12 @@ class RegistrationForm extends Component {
                 onChange={(e) => this._handleImageChange(e)} />
               <div className="imgPreview">
                 {$imagePreview}
+              </div> */}
+              {/* <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                <img alt="example" style={{ width: '100%' }} src={previewImage} />
+              </Modal> */}
+              {/* <div className='imagePreviewUrl'>
+                <img alt="example" style={{ width: '100%' }} src={preview} />
               </div> */}
             </div>
           </Form>
