@@ -53,12 +53,12 @@ export default class extends Component {
             <span onClick={() => {
               // console.log(this.props.record.key , 'key for update');
               // this.updateRecord(this.props.record.key)
-              console.log(this.props.record.key , 'key of the record')
+              console.log(this.props.record.key, 'key of the record')
             }}>Update</span>,
             <span
-              // onClick={() => {
-              //   this.deleteRecord(this.props.record.key);
-              // }}
+            // onClick={() => {
+            //   this.deleteRecord(this.props.record.key);
+            // }}
             >
               Delete
             </span>
@@ -99,7 +99,8 @@ export default class extends Component {
                 <div style={{}}>
                   <h4 className="card-details-heading">Animals</h4>
                   <p className="card-details-value">
-                    {this.props.record.animals.length }
+                    {this.props.record.animals === undefined ? null : this.props.record.animals.length}
+                    {/* {this.props.record.animals.length === undefined ? null : this.props.record.animals.length} */}
                   </p>
                 </div>
                 <div style={{}}>
@@ -122,16 +123,17 @@ export default class extends Component {
             </Row>
             {this.props.record.showAnimalDetails ? (
               <div className="table-container" style={{ marginTop: `15px` }}>
-                <TableRowChild
-                  data={{
-                    ownerId: this.props.record.key,
-                    animals: [...this.props.record.animals]
-                  }}
-                />
+                {this.props.record.animals === undefined ? <div>No Images in Database</div> :
+                  <TableRowChild
+                    data={{
+                      ownerId: this.props.record.key,
+                      animals: [...this.props.record.animals]
+                    }}
+                  />}
               </div>
             ) : (
-              []
-            )}
+                []
+              )}
           </div>
         </Card>
       </div>
