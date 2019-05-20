@@ -307,7 +307,7 @@ class RegistrationForm extends Component {
     });
   };
 
-  beforeUploadAnimalImage(index) {
+  beforeUploadAnimalImage(file, index) {
     const { ownerAnimal } = this.state;
 
     let newState = [...ownerAnimal];
@@ -322,7 +322,7 @@ class RegistrationForm extends Component {
     return false;
   }
 
-  onRemoveAnimalImage(index) {
+  onRemoveAnimalImage(file, index) {
     const { ownerAnimal } = this.state;
 
     let newState = [...ownerAnimal];
@@ -336,7 +336,7 @@ class RegistrationForm extends Component {
 
   handleCancel = () => this.setState({ previewVisible: false });
 
-  beforeUpload = () => {
+  beforeUpload = (ownersImage) => {
 
     this.setState(({ ownersImage }) => {
       const newState = {
@@ -437,8 +437,8 @@ class RegistrationForm extends Component {
               <Upload
                 action="//jsonplaceholder.typicode.com/posts/"
                 listType="picture-card"
-                onRemove={file => this.onRemoveAnimalImage(index)}
-                beforeUpload={file => this.beforeUploadAnimalImage(index)}
+                onRemove={file => this.onRemoveAnimalImage(file, index)}
+                beforeUpload={file => this.beforeUploadAnimalImage(file, index)}
                 onPreview={this.handlePreview}
                 capture
                 accept="image/*"
@@ -449,9 +449,9 @@ class RegistrationForm extends Component {
                 ) : null}
               </Upload>
             )}
-            <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+            {/* <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
               <img alt="example" style={{ width: '100%' }} src={previewImage} />
-            </Modal>
+            </Modal> */}
           </FormItem>
         </div>
       );
@@ -529,7 +529,7 @@ class RegistrationForm extends Component {
                     action="//jsonplaceholder.typicode.com/posts/"
                     listType="picture-card"
                     onRemove={this.onRemove}
-                    beforeUpload={this.beforeUpload}
+                    beforeUpload={file => this.beforeUpload(file)}
                     onPreview={this.handlePreview}
                     capture
                     accept="image/*"
@@ -542,9 +542,9 @@ class RegistrationForm extends Component {
                     ) : null}
                   </Upload>
                 )}
-                <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+                {/* <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
                   <img alt="example" style={{ width: '100%' }} src={previewImage} />
-                </Modal>
+                </Modal> */}
               </FormItem>
             </div>
             <div>
