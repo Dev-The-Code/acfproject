@@ -19,7 +19,8 @@ class RegistrationForm extends Component {
       newVal: '',
       previewVisible: false,
       previewImage: '',
-      preview: ''
+      preview: '',
+      checkConnection: false
     };
 
     this.checkIfNumber = this.checkIfNumber.bind(this);
@@ -40,34 +41,46 @@ class RegistrationForm extends Component {
     //chechk internet connection or localStorage Data
     if (navigator.onLine && offlineData !== null) {
 
-      //get a image type
-      let contentType = offlineData.ownerImage.base64.substring("data:".length,
-        offlineData.ownerImage.base64.indexOf(";base64"))
 
-      //convert base64 to byteCharacters
-      // const byteCharacters = atob(offlineData.ownerImage.base64);
-      let imageData = offlineData.ownerImage.base64;
-      var byteCharacters = atob(imageData.replace(/^data:image\/(png|jpeg|jpg);base64,/, ''));
+      offlineData.map((val) => {
+        console.log(val, 'offline array of the objects');
 
-      //convert byteCharacters to byteNumbers
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
 
-      //create a byteArray
-      const byteArray = new Uint8Array(byteNumbers);
 
-      //create a blob object ob image
-      const blob = new Blob([byteArray], { type: contentType });
+        //get a image type
+        let contentType = val.ownerImage.base64.substring("data:".length,
+          val.ownerImage.base64.indexOf(";base64"))
 
-      //add filed of the object
-      blob['lastModified'] = offlineData.ownerImage.fileList[0].lastModified;
-      blob['lastModifiedDate'] = offlineData.ownerImage.fileList[0].lastModifiedDate;
-      blob['name'] = offlineData.ownerImage.fileList[0].name;
-      blob['uid'] = offlineData.ownerImage.fileList[0].uid;
-      delete offlineData.ownerImage.base64
-      offlineData.ownerImage.fileList[0] = blob
+        //convert base64 to byteCharacters
+        // const byteCharacters = atob(offlineData.ownerImage.base64);
+        let imageData = val.ownerImage.base64;
+        var byteCharacters = atob(imageData.replace(/^data:image\/(png|jpeg|jpg);base64,/, ''));
+
+        //convert byteCharacters to byteNumbers
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+
+        //create a byteArray
+        const byteArray = new Uint8Array(byteNumbers);
+
+        //create a blob object ob image
+        const blob = new Blob([byteArray], { type: contentType });
+
+        //add filed of the object
+        blob['lastModified'] = val.ownerImage.fileList[0].lastModified;
+        blob['lastModifiedDate'] = val.ownerImage.fileList[0].lastModifiedDate;
+        blob['name'] = val.ownerImage.fileList[0].name;
+        blob['uid'] = val.ownerImage.fileList[0].uid;
+        delete val.ownerImage.base64
+        val.ownerImage.fileList[0] = blob
+
+        let animalString = val.animalDetails
+        this.animalImageBlob(animalString, val)
+
+        this.props.createOwnerRecord(val)
+      })
 
 
       //cheking blob is correct creating
@@ -79,20 +92,51 @@ class RegistrationForm extends Component {
       // }
 
       //sending data to database
-      this.props.createOwnerRecord(offlineData)
-
-
-      // offlineData.animalDetails.map((elem, i) => {
-      //   // console.log(elem, 'eeeeeee')
-      //   // console.log(elem.image, "elem");
-      //   // console.log(elem.image = new Blob([JSON.stringify(elem.image)]) , 'elem.image = new Blob([JSON.stringify(elem.image)])');
-      //   return elem.image = new Blob([JSON.stringify(elem.image)], { type: '' })
-      // })
     }
   }
 
-  handleSubmit = (e) => {
-    // console.log('handle submit')
+  async animalImageBlob(values, offlineValuesObj) {
+    Promise.all(values.map((val) => {
+      return this.convertBlobObj(val).then((result) => {
+        delete val.base64
+        val.image = result;
+      })
+    })).then((results) => {
+    })
+  }
+
+
+  convertBlobObj = (files) => {
+    return new Promise((resolve, reject) => {
+
+      //get a image type
+      let contentType = files.base64.substring("data:".length,
+        files.base64.indexOf(";base64"))
+
+      //convert base64 to byteCharacters
+      let imageData = files.base64;
+      var byteCharacters = atob(imageData.replace(/^data:image\/(png|jpeg|jpg);base64,/, ''));
+
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+
+      //create a byteArray
+      const byteArray = new Uint8Array(byteNumbers);
+
+      //create a blob object ob image
+      const blob = new Blob([byteArray], { type: contentType });
+      blob['lastModified'] = files.image.lastModified;
+      blob['lastModifiedDate'] = files.image.lastModifiedDate;
+      blob['name'] = files.image.name;
+      blob['uid'] = files.image.uid;
+      return resolve(blob);
+    });
+  }
+
+  async handleSubmit(e) {
+    const { ownersImage } = this.state
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
@@ -102,6 +146,8 @@ class RegistrationForm extends Component {
         }
         else {
           const offlineValues = this.prepareDataForSaving(values);
+          const file = offlineValues.ownerImage.fileList[0];
+          let base;
 
           //convert image object to base64
           const getBase64 = (file) => {
@@ -109,26 +155,46 @@ class RegistrationForm extends Component {
               const reader = new FileReader();
               reader.onload = () => resolve(reader.result);
               reader.onerror = error => reject(error);
-              // console.log(file, '...............')
               reader.readAsDataURL(file);
             });
           }
 
-          let base;
-          const file = offlineValues.ownerImage.fileList[0];
-          // console.log(file)
           getBase64(file).then(base64 => {
-            // localStorage.setItem("imgData" , base64)
             base = base64
-            // console.debug("file stored", base64);
-            // console.log(base, 'base')
             offlineValues.ownerImage.base64 = base;
-            // offlineValues.animalDetails.map((elem, index) => {
-            //   console.log(elem.image, 'fileList of animal image')
-            localStorage.setItem('animalData', JSON.stringify(offlineValues))
           });
+
+          let animalFile = offlineValues.animalDetails
+          this.animalImageUpload(animalFile, offlineValues)
+
+          this.props.form.resetFields()
+          this.setState({
+            checkConnection: true
+          })
         }
       }
+    });
+  }
+
+  async animalImageUpload(values, offlineValuesObj) {
+    Promise.all(values.map((val) => {
+      return this.convertStringFile(val.image).then((result) => {
+        val.base64 = result
+        // localStorage.setItem('animalData', JSON.stringify(offlineValuesObj))
+      })
+    })).then((results) => {
+      var array = JSON.parse(localStorage.getItem('animalData') || '[]');
+      array.push(offlineValuesObj);
+      localStorage.setItem('animalData', JSON.stringify(array));
+    })
+  }
+
+  convertStringFile = (files) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(files);
     });
   }
 
@@ -167,7 +233,6 @@ class RegistrationForm extends Component {
     compressedImage.uid = uid;
     if (index !== undefined || index !== null) {
       const newState = this.state.ownerAnimal.map((item, i) => {
-        console.log(item, 'item')
         if (i === index) {
           return { ...item, fileList: [compressedImage] }
         }
@@ -235,6 +300,7 @@ class RegistrationForm extends Component {
   }
 
   handlePreview = file => {
+    console.log(file)
     this.setState({
       previewImage: file.url || file.thumbUrl,
       previewVisible: true,
@@ -284,7 +350,8 @@ class RegistrationForm extends Component {
     return false;
   }
 
-  onRemove = () => {
+  onRemove = (file) => {
+    console.log(file)
     this.setState(({ ownersImage }) => {
       const newState = {
         ownersImage: {
@@ -299,7 +366,7 @@ class RegistrationForm extends Component {
 
 
   render() {
-    const { previewVisible, previewImage, preview } = this.state;
+    const { previewVisible, previewImage, preview, checkConnection } = this.state;
     const { getFieldDecorator } = this.props.form;
 
     const formItemLayout = {
@@ -319,6 +386,11 @@ class RegistrationForm extends Component {
           offset: 0
         }
       }
+    };
+    const divStyle = {
+      margin: '10px',
+      // border: '2px solid black',
+      fontSize: '16px'
     };
     let { imagePreviewUrl } = this.state;
     let $imagePreview = null;
@@ -388,7 +460,7 @@ class RegistrationForm extends Component {
     return (
       <div>
         <Card loading={false} title="Add Owner's & Animals Information">
-          <Form onSubmit={this.handleSubmit} layout="vertical">
+          <Form onSubmit={this.handleSubmit.bind(this)} layout="vertical">
             <div>
               <FormItem {...formItemLayout}>
                 {getFieldDecorator("ownerName", {
@@ -500,6 +572,9 @@ class RegistrationForm extends Component {
                     ? `Add`
                     : this.props.formStatus.message}
                 </Button>
+                {checkConnection ? <div style={divStyle}>
+                  You have no Internet Connection Check Connection than refresh the page
+                </div> : null}
               </FormItem>
             </div>
           </Form>

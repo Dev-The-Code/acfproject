@@ -270,6 +270,9 @@ function uploadAnimals(ownerDoc, animalDetails) {
             }
           );
         });
+        if(JSON.parse(localStorage.getItem('animalData')) !== null){
+          localStorage.removeItem('animalData')
+        }
     });
   });
 }
