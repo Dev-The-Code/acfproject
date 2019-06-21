@@ -1,11 +1,11 @@
 const config = {
-  apiKey: "AIzaSyCi0uAhPGXAxWi7TbIKnacodJM1XS8UJHM",
-  authDomain: "newproject-18c99.firebaseapp.com",
-  databaseURL: "https://newproject-18c99.firebaseio.com",
-  projectId: "newproject-18c99",
-  storageBucket: "newproject-18c99.appspot.com",
-  messagingSenderId: "636581759401",
-  appId: "1:636581759401:web:20b02f981aa4d45b"
+  apiKey: "AIzaSyBlcgsOsWU-eeFEeg6bMCQXdWgb1_hjdZg",
+  authDomain: "acfproject-9bbef.firebaseapp.com",
+  databaseURL: "https://acfproject-9bbef.firebaseio.com",
+  projectId: "acfproject-9bbef",
+  storageBucket: "acfproject-9bbef.appspot.com",
+  messagingSenderId: "30450968933",
+  appId: "1:30450968933:web:e220bcc1b5b10901"
 };
 
 export default config;

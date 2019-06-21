@@ -75,23 +75,10 @@ class RegistrationForm extends Component {
         blob['uid'] = val.ownerImage.fileList[0].uid;
         delete val.ownerImage.base64
         val.ownerImage.fileList[0] = blob
-
         let animalString = val.animalDetails
         this.animalImageBlob(animalString, val)
-
         this.props.createOwnerRecord(val)
       })
-
-
-      //cheking blob is correct creating
-      // var reader = new FileReader();
-      // reader.readAsDataURL(offlineData.ownerImage.fileList[0]);
-      // reader.onloadend = function () {
-      //   let base64data = reader.result;
-      //   console.log(base64data);
-      // }
-
-      //sending data to database
     }
   }
 
@@ -542,9 +529,6 @@ class RegistrationForm extends Component {
                     ) : null}
                   </Upload>
                 )}
-                {/* <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
-                  <img alt="example" style={{ width: '100%' }} src={previewImage} />
-                </Modal> */}
               </FormItem>
             </div>
             <div>
