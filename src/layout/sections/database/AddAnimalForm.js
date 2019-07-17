@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { Form, Input, Icon, Button, Upload, message, Card, Modal } from "antd";
+import {
+  Form, Input, Icon, Button, Upload, message, Card, Modal, Row, Col, Checkbox, Slider,
+} from "antd";
 import UploadButton from "../../../components/UploadButton";
 import imageCompress from '../../../imageCompress';
 // import AsyncStorage from '@callstack/async-storage';
@@ -20,7 +22,8 @@ class RegistrationForm extends Component {
       previewVisible: false,
       previewImage: '',
       preview: '',
-      checkConnection: false
+      checkConnection: false,
+      severity: []
     };
 
     this.checkIfNumber = this.checkIfNumber.bind(this);
@@ -30,6 +33,8 @@ class RegistrationForm extends Component {
     this.onRemoveAnimalImage = this.onRemoveAnimalImage.bind(this);
     this.beforeUploadAnimalImage = this.beforeUploadAnimalImage.bind(this);
     this.prepareDataForSaving = this.prepareDataForSaving.bind(this);
+    // this.checkBoxChangeHandler = this.checkBoxChangeHandler.bind(this);
+
   }
 
   //after refresh page render CompenentDidMount
@@ -126,6 +131,7 @@ class RegistrationForm extends Component {
     const { ownersImage } = this.state
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
+      console.log(values, 'add animal form')
       if (!err) {
         if (navigator.onLine) {
           const sanitizedValues = this.prepareDataForSaving(values);
@@ -186,7 +192,7 @@ class RegistrationForm extends Component {
   }
 
   prepareDataForSaving(data) {
-    let { animalAge, animalImage } = data;
+    let { animalAge, animalImage, vetName, site, fieldOfficerName, conditionSeverity, conditionTreatment } = data;
     data.nicNumber === "" || data.nicNumber === undefined ? data.nicNumber = "N/A" : null;
     data.phone === "" || data.phone === undefined ? data.phone = "N/A" : null;
     data.animalImage = this.state.ownerAnimal.map((item, i) => {
@@ -196,9 +202,32 @@ class RegistrationForm extends Component {
 
     const readyObject = animalAge.reduce(
       (accumulator, item, index) =>
-        accumulator.concat({ age: item, image: this.state.ownerAnimal[index].fileList[0] }),
+        // console.log(accumulator , 'accumulator')
+        accumulator.concat({
+          age: item, image: this.state.ownerAnimal[index].fileList[0],
+          vetName: vetName, site: site, fieldOfficerName: fieldOfficerName,
+          conditionSeverity: conditionSeverity, conditionTreatment: conditionTreatment
+        }),
       []
     );
+    const vetNames = vetName.reduce(
+      (accumulator, item, index) =>
+        accumulator.concat({
+          vetName: item,
+          // site: site, fieldOfficerName: fieldOfficerName,
+          // conditionSeverity: conditionSeverity, conditionTreatment: conditionTreatment
+        }),
+      []
+    );
+    console.log(readyObject, 'readyObject')
+    console.log(vetNames , 'vetNames')
+    // console.log(animalAge, 'animalAge')
+    // console.log(vetName, 'vetName')
+    // console.log(site, 'site')
+    // console.log(fieldOfficerName, 'fieldOfficerName')
+    // console.log(conditionSeverity, 'conditionSeverity')
+    // console.log(conditionTreatment, 'conditionTreatment')
+
 
     delete data.animalAge;
     delete data.animalImage;
@@ -351,6 +380,30 @@ class RegistrationForm extends Component {
     });
   }
 
+  checkBoxChangeHandler(index, value) {
+    // console.log(index, 'index')
+    // console.log(value, 'value')
+
+    this.updateStateForSeverity(index, value);
+  }
+
+  updateStateForSeverity(index, conditionName) {
+    // console.log(`${conditionName}[${index}]` , 'value of Severity')
+    // console.log(conditionName , 'value of Severity')
+    // let condition = `${conditionName}[${index}]`
+    // console.log(condition , 'condition ')
+    let conditionArr = []
+    conditionArr.push(conditionName)
+    this.setState(prevState => {
+      return {
+        // severity: `${conditionName}[${index}]`
+        severity: conditionArr
+        // severity: conditionName
+
+      };
+    });
+    console.log(conditionArr)
+  }
 
   render() {
     const { previewVisible, previewImage, preview, checkConnection } = this.state;
@@ -386,6 +439,55 @@ class RegistrationForm extends Component {
     } else {
       $imagePreview = (<div className="previewText">Please select an Image for Preview</div>);
     }
+
+    //add tretment
+    // const severitySelector = this.state.severity.map((item, index) => {
+    //   console.log(item , 'item')
+    //   console.log(index , 'index')
+    //   return (
+    //     <div key={index}>
+    //       <FormItem {...formItemLayout} key={index + "sevirity"}>
+    //         {getFieldDecorator(`conditionSeverity[${index}]`)(
+    //           <Slider marks={{ 0: "Mild", 50: "Moderate", 100: "Severe" }} />
+    //         )}
+    //       </FormItem>
+    //       <FormItem
+    //         {...formItemLayout}
+    //         key={index + `treat`}
+    //         extra={`Select ${item} Severity & Treatments`}
+    //       >
+    //         {getFieldDecorator(`conditionTreatment[${index}]`)(
+    //           <Input placeholder={`Treatment Given`} />
+    //         )}
+    //       </FormItem>
+    //     </div>
+    //   );
+    // });
+    //  //add tretment
+    const severitySelector = this.state.severity.map((item, index) => {
+      return item.map((items, indexes) => {
+        console.log(items, 'items')
+        console.log(indexes, 'indexes')
+        return (
+          <div key={indexes}>
+            <FormItem {...formItemLayout} key={indexes + "sevirity"}>
+              {getFieldDecorator(`conditionSeverity[${indexes}]`)(
+                <Slider marks={{ 0: "Mild", 50: "Moderate", 100: "Severe" }} />
+              )}
+            </FormItem>
+            <FormItem
+              {...formItemLayout}
+              key={indexes + `treat`}
+              extra={`Select ${items} Severity & Treatments`}
+            >
+              {getFieldDecorator(`conditionTreatment[${indexes}]`)(
+                <Input placeholder={`Treatment Given`} />
+              )}
+            </FormItem>
+          </div>
+        );
+      })
+    });
 
     const animalFields = this.state.ownerAnimal.map((k, index) => {
       return (
@@ -440,6 +542,147 @@ class RegistrationForm extends Component {
               <img alt="example" style={{ width: '100%' }} src={previewImage} />
             </Modal> */}
           </FormItem>
+          <FormItem {...formItemLayout}>
+            {getFieldDecorator(`vetName[${index}]`, {
+              rules: [
+                { type: "string", message: "The input is not a valid Name" },
+                { required: true, message: "Please input your name!" }
+              ]
+            })(<Input placeholder="Vet's name" />)}
+          </FormItem>
+          <FormItem {...formItemLayout}>
+            {getFieldDecorator(`site[${index}]`, {
+              rules: [{ required: true, message: `Enter a site` }]
+            })(<Input placeholder="Site name" />)}
+          </FormItem>
+          <FormItem {...formItemLayout}>
+            {getFieldDecorator(`fieldOfficerName[${index}]`, {
+              rules: [
+                { required: true, message: `Enter a field officer name` }
+              ]
+            })(<Input placeholder="Field officer name" />)}
+          </FormItem>
+
+          <Card loading={false} title="Conditions">
+            <Checkbox.Group
+              style={{ width: "100%" }}
+              onChange={this.checkBoxChangeHandler.bind(this, index)}
+            // onChange={this.checkBoxChangeHandler}
+
+            >
+              <Row>
+                <Col xs={24} sm={1} md={1} lg={12} xl={6}>
+                  <div>
+                    <Checkbox value="Harness wound">Harness wound</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Saddle wound">Saddle wound</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Hobbles wound">Hobbles wound</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Hoof problem">Hoof problem</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Hip dislocation">
+                      Hip dislocation
+                      </Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Leg lameness">Leg lameness</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Eye problem">Eye problem</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Circling movement">
+                      Circling movement
+                      </Checkbox>
+                  </div>
+                </Col>
+                <Col xs={24} sm={1} md={1} lg={1} xl={6}>
+                  <div>
+                    <Checkbox value="Mixed infection">
+                      Mixed infection
+                      </Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Pyrexia">Pyrexia</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Anaemic condition">
+                      Anaemic condition
+                      </Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Mineral deficiency">
+                      Mineral deficiency
+                      </Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Urea condition">Urea condition</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Diarrhoea">Diarrhoea</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Colic">Colic</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Respiratory">Respiratory</Checkbox>
+                  </div>
+                </Col>
+                <Col xs={24} sm={1} md={1} lg={1} xl={6}>
+                  <div>
+                    <Checkbox value="Dystosia condition">
+                      Dystosia condition
+                      </Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Dermatitis">Dermatitis</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Anal prolapse">Anal prolapse</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Tetnus vaccine">Tetnus vaccine</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Deworming">Deworming</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Emergency">Emergency</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Anaplasmosis">Anaplasmosis</Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Strangle suspicion">
+                      Strangle suspicion
+                      </Checkbox>
+                  </div>
+                  <div>
+                    <Checkbox value="Maggot infection">
+                      Maggot infection
+                      </Checkbox>
+                  </div>
+                </Col>
+              </Row>
+            </Checkbox.Group>
+          </Card>
+          <div style={{ margin: `10px 0px` }}>
+            <Card
+              loading={false}
+              title={
+                severitySelector === []
+                  ? null
+                  : `Severity & Treatment`
+              }
+            >
+              {severitySelector}
+            </Card>
+          </div>
         </div>
       );
     });

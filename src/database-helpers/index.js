@@ -229,16 +229,21 @@ function uploadAnimals(ownerDoc, animalDetails) {
 
   return animalDetails.map((animal, index) => {
     return new Promise((resolve, reject) => {
-      let { age, image } = animal;
-      console.log(animal, 'animal');
+      let { age, image, vetName, site, fieldOfficerName, conditionSeverity, conditionTreatment, } = animal;
+      // console.log(animal, 'animal');
       console.log(animalDetails, 'animalDetails')
 
       const docRef = animalCollection.doc(ownerDoc.id + index);
-      
+
 
       docRef
         .set({
           age,
+          vetName,
+          site,
+          fieldOfficerName,
+          conditionSeverity,
+          conditionTreatment,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         })
         .then(() => {
@@ -270,9 +275,9 @@ function uploadAnimals(ownerDoc, animalDetails) {
             }
           );
         });
-        if(JSON.parse(localStorage.getItem('animalData')) !== null){
-          localStorage.removeItem('animalData')
-        }
+      if (JSON.parse(localStorage.getItem('animalData')) !== null) {
+        localStorage.removeItem('animalData')
+      }
     });
   });
 }

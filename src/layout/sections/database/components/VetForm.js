@@ -51,6 +51,7 @@ class RegistrationForm extends Component {
   handleSubmit(e) {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll(async (err, values) => {
+      console.log(values , 'in treatment')
       if (!err) {
         const finalValues = await this.sanitizeFormValues(values);
         this.props.addAnimalCondition(this.props.id, finalValues);

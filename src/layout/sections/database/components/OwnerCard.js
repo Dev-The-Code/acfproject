@@ -32,7 +32,7 @@ export default class extends Component {
     this.props.changeCurrentRecordState(currentState, id);
   }
   render() {
-    console.log(this.props.record.animals)
+    // console.log(this.props.record.animals)
     // console.log(this.props.record)
     return (
       <div>
