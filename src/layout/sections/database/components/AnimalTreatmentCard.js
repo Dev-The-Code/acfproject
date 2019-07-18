@@ -24,6 +24,7 @@ export default class extends Component {
   }
 
   render() {
+    console.log(this.props)
     return (
       <div>
         <Card
@@ -49,10 +50,24 @@ export default class extends Component {
                   <p className="card-details-value">{this.props.animalId}</p>
                 </div>
                 <div style={{}}>
-                  <h4 className="card-details-heading">Treatment ID</h4>
-                  <p className="card-details-value">{this.props.record.key}</p>
+                  <h4 className="card-details-heading">Vet Name</h4>
+                  <p className="card-details-value">
+                    {this.props.record.vetName}
+                  </p>
                 </div>
                 <div style={{}}>
+                  <h4 className="card-details-heading">Added On</h4>
+                  <p className="card-details-value">
+                    {new Date(
+                      parseInt(this.props.record.timestamp.seconds) * 1000
+                    ).toLocaleString()}
+                  </p>
+                </div>
+                {/* <div style={{}}>
+                  <h4 className="card-details-heading">Treatment ID</h4>
+                  <p className="card-details-value">{this.props.record.key}</p>
+                </div> */}
+                {/* <div style={{}}>
                   <h4 className="card-details-heading">Latitude</h4>
                   <p className="card-details-value">
                     {this.props.record.geoLocation.lat}
@@ -63,7 +78,7 @@ export default class extends Component {
                   <p className="card-details-value">
                     {this.props.record.geoLocation.long}
                   </p>
-                </div>
+                </div> */}
               </Col>
               <Col xs={24} sm={24} md={24} lg={24} xl={12}>
                 <div style={{}}>
@@ -74,22 +89,6 @@ export default class extends Component {
                   <h4 className="card-details-heading">Field Officer</h4>
                   <p className="card-details-value">
                     {this.props.record.fieldOfficerName}
-                  </p>
-                </div>
-
-                <div style={{}}>
-                  <h4 className="card-details-heading">Vet Name</h4>
-                  <p className="card-details-value">
-                    {this.props.record.vetName}
-                  </p>
-                </div>
-
-                <div style={{}}>
-                  <h4 className="card-details-heading">Added On</h4>
-                  <p className="card-details-value">
-                    {new Date(
-                      parseInt(this.props.record.timestamp.seconds) * 1000
-                    ).toLocaleString()}
                   </p>
                 </div>
               </Col>

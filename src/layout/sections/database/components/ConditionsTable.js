@@ -38,11 +38,12 @@ const columns = [
 
 export default class extends React.Component {
   render() {
+    console.log(this.props)
     const dataSrouce = this.props.conditionData.map((data, index) => {
         return {...data, key: `${index}-condition`}    
     }) 
 
-
+    console.log(dataSrouce, 'dataSrouce')
     return (
       <Table
         bordered={true}

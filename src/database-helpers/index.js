@@ -49,15 +49,15 @@ export async function getAnimalTreatments(payload) {
   const querySnapshot = await firestore
     .collection("animals")
     .doc(id)
-    .collection("treatments")
+    // .collection("treatments")
     .get();
 
   let dataArray = [];
-
-  querySnapshot.forEach(doc => {
-    dataArray.push({ ...doc.data(), key: doc.id });
-  });
-
+  console.log(querySnapshot.id, 'querySnapshot')
+  // querySnapshot.forEach(doc => {
+  //   dataArray.push({ ...doc.data(), key: doc.id });
+  // });
+  dataArray.push({ ...querySnapshot.data(), key: querySnapshot.id })
   return dataArray;
 }
 export async function saveAnimalCondition(payload) {
@@ -66,7 +66,7 @@ export async function saveAnimalCondition(payload) {
   const docRef = await firestore
     .collection("animals")
     .doc(docId)
-    .collection("treatments")
+    // .collection("treatments")
     .add({
       ...rest,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -229,7 +229,7 @@ function uploadAnimals(ownerDoc, animalDetails) {
 
   return animalDetails.map((animal, index) => {
     return new Promise((resolve, reject) => {
-      let { age, image, vetName, site, fieldOfficerName, conditionSeverity, conditionTreatment, } = animal;
+      let { age, image, vetName, site, fieldOfficerName, mappedConditions } = animal;
       // console.log(animal, 'animal');
       console.log(animalDetails, 'animalDetails')
 
@@ -242,8 +242,7 @@ function uploadAnimals(ownerDoc, animalDetails) {
           vetName,
           site,
           fieldOfficerName,
-          conditionSeverity,
-          conditionTreatment,
+          mappedConditions,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         })
         .then(() => {

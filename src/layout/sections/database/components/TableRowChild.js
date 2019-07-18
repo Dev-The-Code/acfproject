@@ -34,7 +34,7 @@ const columns = [
           View Treatment
         </Link>
         <Divider type="vertical" />
-        <Link to={`/database/add-treatment/${record.key}`}>Add Treatment</Link>
+        {/* <Link to={`/database/add-treatment/${record.key}`}>Add Treatment</Link> */}
       </span>
     )
   }

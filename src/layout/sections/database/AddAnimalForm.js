@@ -7,7 +7,8 @@ import imageCompress from '../../../imageCompress';
 // import AsyncStorage from '@callstack/async-storage';
 
 const FormItem = Form.Item;
-
+let arrf = [];
+let checking = [];
 class RegistrationForm extends Component {
   constructor(props) {
     super(props);
@@ -23,7 +24,8 @@ class RegistrationForm extends Component {
       previewImage: '',
       preview: '',
       checkConnection: false,
-      severity: []
+      severity: [],
+      values: []
     };
 
     this.checkIfNumber = this.checkIfNumber.bind(this);
@@ -41,17 +43,14 @@ class RegistrationForm extends Component {
   async componentDidMount() {
     //get data from local storage
     let offlineData = JSON.parse(localStorage.getItem('animalData'))
-    console.log(offlineData, 'offlineData')
+    // console.log(offlineData, 'offlineData')
 
     //chechk internet connection or localStorage Data
     if (navigator.onLine && offlineData !== null) {
 
 
       offlineData.map((val) => {
-        console.log(val, 'offline array of the objects');
-
-
-
+        // console.log(val, 'offline array of the objects');
         //get a image type
         let contentType = val.ownerImage.base64.substring("data:".length,
           val.ownerImage.base64.indexOf(";base64"))
@@ -131,7 +130,10 @@ class RegistrationForm extends Component {
     const { ownersImage } = this.state
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
-      console.log(values, 'add animal form')
+      console.log(values, 'add animal')
+      // console.log(values.conditionSeverity, 'conditionSeverity')
+      // console.log(values.conditionTreatment, 'conditionSeverity')
+
       if (!err) {
         if (navigator.onLine) {
           const sanitizedValues = this.prepareDataForSaving(values);
@@ -200,37 +202,112 @@ class RegistrationForm extends Component {
     });
     data.ownerImage === "" || data.ownerImage === undefined ? data.ownerImage = this.state.ownersImage : null;
 
-    const readyObject = animalAge.reduce(
-      (accumulator, item, index) =>
-        // console.log(accumulator , 'accumulator')
-        accumulator.concat({
-          age: item, image: this.state.ownerAnimal[index].fileList[0],
-          vetName: vetName, site: site, fieldOfficerName: fieldOfficerName,
-          conditionSeverity: conditionSeverity, conditionTreatment: conditionTreatment
-        }),
-      []
-    );
-    const vetNames = vetName.reduce(
+
+    //getting check boxes and slider values
+    // const mappedConditions = this.state.severity.map((condition, index) => {
+    //   console.log(condition, 'condition')
+    //   console.log(this.state.severity, 'severity')
+
+    //   return {
+    //     condition,
+    //     severity:
+    //       conditionSeverity[index] === "" ||
+    //         conditionSeverity[index] === undefined
+    //         ? "N/A"
+    //         : conditionSeverity[index],
+    //     treatment:
+    //       conditionTreatment[index] === "" ||
+    //         conditionTreatment[index] === undefined
+    //         ? "N/A"
+    //         : conditionTreatment[index]
+    //   };
+    // });
+
+
+    // const mappedConditions = this.state.severity.map((condition, index) => {
+    //   return {
+    //     condition,
+    //     severity:
+    //       conditionSeverity[index] === "" ||
+    //         conditionSeverity[index] === undefined
+    //         ? "N/A"
+    //         : data.conditionSeverity[index],
+    //     treatment:
+    //       conditionTreatment[index] === "" ||
+    //         conditionTreatment[index] === undefined
+    //         ? "N/A"
+    //         : data.conditionTreatment[index]
+    //   };
+    // });
+    // console.log(mappedConditions, 'mappedConditions')
+
+    //getting add treatment field values
+    let vetNameObject = vetName.reduce(
       (accumulator, item, index) =>
         accumulator.concat({
           vetName: item,
-          // site: site, fieldOfficerName: fieldOfficerName,
-          // conditionSeverity: conditionSeverity, conditionTreatment: conditionTreatment
         }),
       []
     );
-    console.log(readyObject, 'readyObject')
-    console.log(vetNames , 'vetNames')
-    // console.log(animalAge, 'animalAge')
-    // console.log(vetName, 'vetName')
-    // console.log(site, 'site')
-    // console.log(fieldOfficerName, 'fieldOfficerName')
-    // console.log(conditionSeverity, 'conditionSeverity')
-    // console.log(conditionTreatment, 'conditionTreatment')
 
+    //getting add treatment field values
+    let siteObject = site.reduce(
+      (accumulator, item, index) =>
+        accumulator.concat({
+          site: item,
+        }),
+      []
+    );
+
+    //getting add treatment field values
+    let fieldOfficerObject = fieldOfficerName.reduce(
+      (accumulator, item, index) =>
+        accumulator.concat({
+          fieldOfficerName: item,
+        }),
+      []
+    );
+
+    //getting animal field value
+    const readyObject = animalAge.reduce(
+      (accumulator, item, index) =>
+        accumulator.concat({
+          age: item, image: this.state.ownerAnimal[index].fileList[0],
+        }),
+      []
+    );
+
+    //concat animal & add treatment values
+    for (var i = 0; i < readyObject.length; i++) {
+      readyObject[i].vetName = vetNameObject[i].vetName;
+      readyObject[i].site = siteObject[i].site;
+      readyObject[i].fieldOfficerName = fieldOfficerObject[i].fieldOfficerName;
+      readyObject[i].mappedConditions = this.state.severity.map((condition, index) => {
+        return {
+          condition,
+          severity:
+            conditionSeverity[index] === "" ||
+              conditionSeverity[index] === undefined
+              ? "N/A"
+              : data.conditionSeverity[index],
+          treatment:
+            conditionTreatment[index] === "" ||
+              conditionTreatment[index] === undefined
+              ? "N/A"
+              : data.conditionTreatment[index]
+        };
+      });
+    }
+
+    console.log(readyObject, 'readyObject')
 
     delete data.animalAge;
     delete data.animalImage;
+    delete data.vetName;
+    delete data.site;
+    delete data.fieldOfficerName;
+    delete data.conditionSeverity;
+    delete data.conditionTreatment;
 
     data.animalDetails = readyObject;
     data.ownerImage = this.state.ownersImage;
@@ -316,7 +393,7 @@ class RegistrationForm extends Component {
   }
 
   handlePreview = file => {
-    console.log(file)
+    // console.log(file)
     this.setState({
       previewImage: file.url || file.thumbUrl,
       previewVisible: true,
@@ -367,7 +444,7 @@ class RegistrationForm extends Component {
   }
 
   onRemove = (file) => {
-    console.log(file)
+    // console.log(file)
     this.setState(({ ownersImage }) => {
       const newState = {
         ownersImage: {
@@ -381,9 +458,6 @@ class RegistrationForm extends Component {
   }
 
   checkBoxChangeHandler(index, value) {
-    // console.log(index, 'index')
-    // console.log(value, 'value')
-
     this.updateStateForSeverity(index, value);
   }
 
@@ -392,18 +466,29 @@ class RegistrationForm extends Component {
     // console.log(conditionName , 'value of Severity')
     // let condition = `${conditionName}[${index}]`
     // console.log(condition , 'condition ')
-    let conditionArr = []
-    conditionArr.push(conditionName)
+    // let conditionArr = []
+    // conditionArr.push(conditionName)
+
+    arrf.push(`${conditionName}[${index}]`);
+
+    // let val = arrf.indexOf(conditionName);
+    // console.log(val , 'val')
+
+    // if (val !== -1) {
+    //   arrf[val] = "";
+    // }
     this.setState(prevState => {
       return {
         // severity: `${conditionName}[${index}]`
-        severity: conditionArr
-        // severity: conditionName
+        // severity: conditionArr
+        // values: conditionArr,
+        severity: arrf
 
       };
     });
-    console.log(conditionArr)
+    // console.log(`${conditionName}[${index}]`)
   }
+
 
   render() {
     const { previewVisible, previewImage, preview, checkConnection } = this.state;
@@ -441,54 +526,32 @@ class RegistrationForm extends Component {
     }
 
     //add tretment
-    // const severitySelector = this.state.severity.map((item, index) => {
-    //   console.log(item , 'item')
-    //   console.log(index , 'index')
-    //   return (
-    //     <div key={index}>
-    //       <FormItem {...formItemLayout} key={index + "sevirity"}>
-    //         {getFieldDecorator(`conditionSeverity[${index}]`)(
-    //           <Slider marks={{ 0: "Mild", 50: "Moderate", 100: "Severe" }} />
-    //         )}
-    //       </FormItem>
-    //       <FormItem
-    //         {...formItemLayout}
-    //         key={index + `treat`}
-    //         extra={`Select ${item} Severity & Treatments`}
-    //       >
-    //         {getFieldDecorator(`conditionTreatment[${index}]`)(
-    //           <Input placeholder={`Treatment Given`} />
-    //         )}
-    //       </FormItem>
-    //     </div>
-    //   );
-    // });
-    //  //add tretment
+    // let arr =[];
+    // let arr2 = [];
+    // arr.push(this.state.severity)
+    // console.log(this.state.severity, 'severity')
     const severitySelector = this.state.severity.map((item, index) => {
-      return item.map((items, indexes) => {
-        console.log(items, 'items')
-        console.log(indexes, 'indexes')
-        return (
-          <div key={indexes}>
-            <FormItem {...formItemLayout} key={indexes + "sevirity"}>
-              {getFieldDecorator(`conditionSeverity[${indexes}]`)(
-                <Slider marks={{ 0: "Mild", 50: "Moderate", 100: "Severe" }} />
-              )}
-            </FormItem>
-            <FormItem
-              {...formItemLayout}
-              key={indexes + `treat`}
-              extra={`Select ${items} Severity & Treatments`}
-            >
-              {getFieldDecorator(`conditionTreatment[${indexes}]`)(
-                <Input placeholder={`Treatment Given`} />
-              )}
-            </FormItem>
-          </div>
-        );
-      })
+      return (
+        <div key={index}>
+          <FormItem {...formItemLayout} key={index + "sevirity"}>
+            {getFieldDecorator(`conditionSeverity[${index}]`)(
+              <Slider marks={{ 0: "Mild", 50: "Moderate", 100: "Severe" }} />
+            )}
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            key={index + `treat`}
+            extra={`Select ${item} Severity & Treatments`}
+          >
+            {getFieldDecorator(`conditionTreatment[${index}]`)(
+              <Input placeholder={`Treatment Given`} />
+            )}
+          </FormItem>
+        </div>
+      );
     });
-
+    // arrf.push(severitySelector)
+    // console.log(arrf , 'severitySelector')
     const animalFields = this.state.ownerAnimal.map((k, index) => {
       return (
         <div key={index}>
