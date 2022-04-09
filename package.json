@@ -11,7 +11,7 @@
     "firebase-functions": "^3.0.1",
     "idb": "^2.1.3",
     "lodash": "^4.17.10",
-    "moment": "^2.22.2",
+    "moment": "^2.29.2",
     "pica": "^4.1.1",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
